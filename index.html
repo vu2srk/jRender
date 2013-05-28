@@ -1,0 +1,209 @@
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+<script src="jRender.js"></script>
+
+<script type="text/javascript">
+	var json = {
+		"$schema" : "http://json-schema.org/draft-04/schema#",
+		"title" : "Product set",
+		"type" : "array",
+		"items" : {
+			"title" : "Product",
+			"type" : "object",
+			"properties" : {
+				"id" : {
+					"description" : "The unique identifier for a product",
+					"type" : "number"
+				},
+				"name" : {
+					"type" : "string"
+				},
+				"price" : {
+					"type" : "number",
+					"minimum" : 0,
+					"exclusiveMinimum" : true
+				},
+				"tags" : {
+					"type" : "array",
+					"items" : {
+						"type" : "string"
+					},
+					"minItems" : 1,
+					"uniqueItems" : true
+				},
+				"dimensions" : {
+					"type" : "object",
+					"properties" : {
+						"length" : {
+							"type" : "number"
+						},
+						"width" : {
+							"type" : "number"
+						},
+						"height" : {
+							"type" : "number"
+						}
+					},
+					"required" : ["length", "width", "height"]
+				},
+				"warehouseLocation" : {
+					"description" : "Coordinates of the warehouse with the product",
+					"$ref" : "#/definitions/geo"
+				},
+				"test" : {
+					"type" : "array",
+					"items" : {
+						"type" : "object", 
+						"$ref" : "#"
+					}
+				}
+			},
+			"required" : ["id", "name", "price"]
+		},
+		"definitions" : {
+			"geo" : {
+				"description" : "A geographical coordinate",
+				"type" : "object",
+				"properties" : {
+					"latitude" : {
+						"type" : "number"
+					},
+					"longitude" : {
+						"type" : "number"
+					}
+				}
+			}
+		}
+	}
+
+	var json2 = {
+		"id" : "http://some.site.somewhere/entry-schema#",
+		"$schema" : "http://json-schema.org/draft-04/schema#",
+		"description" : "schema for an fstab entry",
+		"title" : "File System",
+		"type" : "object",
+		"required" : ["storage"],
+		"properties" : {
+			"storage" : {
+				"type" : "object",
+				"$ref" : "#/definitions/nfs"
+			},
+			"fstype" : {
+				"enum" : ["ext3", "ext4", "btrfs"]
+			},
+			"test" : {
+				"type" : "array",
+				"items" : {
+					"type" : "object",
+					"$ref" : "#/definitions/nfs"
+				}
+			},
+			"test2" : {
+				"type" : "array",
+				"items" : {
+					"type" : "object",
+					"$ref" : "#"
+				}
+			},
+			"options" : {
+				"type" : "array",
+				"minItems" : 1,
+				"items" : {
+					"type" : "string"
+				},
+				"uniqueItems" : true
+			},
+			"readonly" : {
+				"type" : "boolean"
+			}
+		},
+		"definitions" : {
+			"diskDevice" : {
+				"properties" : {
+					"type" : {
+						"enum" : ["disk"]
+					},
+					"device" : {
+						"type" : "string",
+						"pattern" : "^/dev/[^/]+(/[^/]+)*$"
+					}
+				},
+				"required" : ["type", "device"],
+				"additionalProperties" : false
+			},
+			"diskUUID" : {
+				"properties" : {
+					"type" : {
+						"enum" : ["disk"]
+					},
+					"label" : {
+						"type" : "string",
+						"pattern" : "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+					}
+				},
+				"required" : ["type", "label"],
+				"additionalProperties" : false
+			},
+			"nfs" : {
+				"properties" : {
+					"type" : {
+						"enum" : ["nfs"]
+					},
+					"remotePath" : {
+						"type" : "string",
+						"pattern" : "^(/[^/]+)+$"
+					},
+					"server" : {
+						"type" : "string",
+						"oneOf" : [{
+							"format" : "host-name"
+						}, {
+							"format" : "ipv4"
+						}, {
+							"format" : "ipv6"
+						}]
+					}
+				},
+				"required" : ["type", "server", "remotePath"],
+				"additionalProperties" : false
+			},
+			"tmpfs" : {
+				"properties" : {
+					"type" : {
+						"enum" : ["tmpfs"]
+					},
+					"sizeInMB" : {
+						"type" : "integer",
+						"minimum" : 16,
+						"maximum" : 512
+					}
+				},
+				"required" : ["type", "sizeInMB"],
+				"additionalProperties" : false
+			}
+		}
+	};
+	$(document).ready(function() {
+		jrender = jRender(json);
+		$("#hello_div").append(jrender.forms["Product set"].button);
+	})
+
+</script>
+
+<html>
+	<head>
+		<style type="text/css">
+			.indent { 
+				position : "relative";
+				margin-left : 20px;
+				border-left : 3px solid #e1e2e2;
+				padding : 5px;
+			}
+		</style>
+		
+	</head>
+	<body>
+		<div id = "hello_div">
+
+		</div>
+	</body>
+</html>
