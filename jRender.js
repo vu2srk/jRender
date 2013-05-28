@@ -24,7 +24,7 @@
 		},
 
 		createForms : function(json, prop_name, type) {
-			json.type && (type = json.type);
+			json.type && ( type = json.type);
 
 			var form = null;
 
@@ -33,11 +33,11 @@
 
 			if (ref && ref != "#") {
 				ref_schema = this.getRefSchema(ref);
-				!type && (type = ref_schema.type);
+				!type && ( type = ref_schema.type);
 			}
 			var title = (ref_schema && ref_schema.title) || prop_name || json.title;
-			
-			if (ref && ref == "#"){
+
+			if (ref && ref == "#") {
 				type = type || this.schema.type;
 				title = this.root;
 			}
@@ -47,32 +47,51 @@
 				form = jQuery("<div>");
 				if (!this.forms[title])
 					this.forms[title] = {};
-				if (this.forms[title] && !this.forms[title].button){
+				if (this.forms[title] && !this.forms[title].button) {
 					var button = this.renderButton((json.items && json.items.title) || title);
 					this.forms[title].button = button;
 				} else {
-					button = this.forms[title].button.clone(true);
+					button = this.forms[title].button.clone(true).html("Add " + prop_name);
 				}
 				form.append(button);
-				if (ref!="#")
+				if (ref != "#")
 					this.forms[title].html = this.createForms((ref_schema || json.items), prop_name, json.items.type);
 				return form;
 
 			} else if (type == "object") {
-				if (ref!="#"){
+				if (ref != "#") {
 					form = jQuery("<div>");
 					var h4 = jQuery("<h4>").html(title);
 					form.append(h4);
 					this.forms[title] = {};
-					
+
 					var properties = (ref_schema && ref_schema.properties) || json.properties;
 					for (var prop in properties) {
 						form.append(this.createForms(properties[prop], prop));
 					}
-					
+
 					this.forms[title].html = form;
 					return form;
-				} 
+				} else {
+					var me = this;
+					var button = null;
+					form = jQuery("<div>");
+					if (!this.forms[title])
+						this.forms[title] = {};
+					if (this.forms[title] && !this.forms[title].button) {
+						button = this.renderButton((json.items && json.items.title) || title);
+						this.forms[title].button = button;
+					} else {
+						button = this.forms[title].button.clone().html("Add " + prop_name);
+						button.on("click", function() {
+							var parent = this.parentNode;
+							$(parent).empty();
+							$(parent).append(me.forms[title].html.clone(true).addClass("indent"));
+						});
+					}
+					form.append(button);
+					return form;
+				}
 			} else {
 
 				form = jQuery("<input>");
