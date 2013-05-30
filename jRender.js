@@ -18,7 +18,7 @@
 			this.root_type = json.type || this.getFormType(json);
 			this.root = "#";
 			this.forms = {};
-			this.createForms("#", json);
+			this.createForms("#", json, "#");
 		},
 
 		getRefSchema : function(ref_path_parts) {
@@ -50,8 +50,16 @@
 
 			return type;
 		},
+		
+		__detectSelfReferencing__ : function(path, $ref){
+			if (path.indexOf($ref) != -1){
+				console.log("Detected self referencing");
+				//throw new Error("Detected self referencing")
+				return true;
+			}
+		},
 
-		createForms : function(root, _fragment) {
+		createForms : function(root, _fragment, path) {
 			var next_root;
 			var me = this;
 			var recognized_type;
@@ -65,11 +73,22 @@
 			if (recognized_type == jRender.ARRAY) {
 				var items;
 				if (_fragment.$ref) {
+					var _isSelfReference = this.__detectSelfReferencing__(path, _fragment.$ref);
 					var ref_path_parts = _fragment.$ref.split("/");
-					items = this.getRefSchema(ref_path_parts);
 					next_root = ref_path_parts[ref_path_parts.length - 1];
+					if (_isSelfReference){
+						var html;
+						if (me.forms[next_root] instanceof jRender.UTILS["Button"])
+							html = new Button(null, me.forms[next_root].html.clone(true).addClass("indent"));
+						else if (me.forms[next_root] instanceof jRender.UTILS["Form"])
+							html = new Button(null, me.forms[next_root].html.clone(true).addClass("indent"));
+						this.forms[root] = html;
+						return html;
+					}
+					path += "/" + next_root;
+					items = this.getRefSchema(ref_path_parts);
 					_fragment = items;
-					this.forms[root] = this.createForms(next_root, _fragment);
+					this.forms[root] = this.createForms(next_root, _fragment, path);
 				} else {
 					items = _fragment.items;
 					next_root = items.title || root + "_items";
@@ -79,10 +98,11 @@
 					button.html.on("click", function(e) {
 						e.preventDefault();
 						$(this.parentNode).append(me.forms[next_root].html.clone(true).addClass("indent"));
-					})
+					});
 					this.forms[root] = button;
 					_fragment = items;
-					this.createForms(next_root, _fragment);
+					path += "/" + next_root;
+					this.createForms(next_root, _fragment, path);
 					return button;
 				}
 			} else if (recognized_type == jRender.OBJECT) {
@@ -94,13 +114,16 @@
 				if (_fragment.$ref) {
 					var ref_path_parts = _fragment.$ref.split("/");
 					next_root = ref_path_parts[ref_path_parts.length - 1];
+					this.__detectSelfReferencing__(path, _fragment.$ref);
+					path += "/" + next_root;
 					_fragment = this.getRefSchema(ref_path_parts);
-					sub_form = this.createForms(next_root, _fragment);
+					sub_form = this.createForms(next_root, _fragment, path);
 					form.html.append(sub_form.html);
 				} else {
 					for (var prop in properties) {
 						next_root = prop;
-						sub_form = this.createForms(next_root, properties[prop]);
+						path += "/" + next_root;
+						sub_form = this.createForms(next_root, properties[prop], path);
 						form.html.append(sub_form.html);
 					}
 				}
@@ -117,8 +140,9 @@
 		}
 	}
 
-	var Button = function(button_text) {
-		var button = jQuery("<button>").html("Add " + button_text);
+	var Button = function(button_text, button) {
+		if (!button)
+			button = jQuery("<button>").html("Add " + button_text);
 		this.html = button;
 	}
 	var Form = function(name) {

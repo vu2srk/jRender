@@ -137,19 +137,25 @@
 				}
 			},
 			"double" : {
-				"type" : "array",
-				"items" : {
-					"properties" : {
-						"type" : {
-							"type" : "string"
+				"type" : "object",
+				"properties" : {
+
+					"type" : {
+						"type" : "string"
+					},
+					"self" : {
+						"type" : "array",
+						"items" : {
+							"$ref" : "#"
 						}
 					}
+
 				}
 			}
 		}
 	}
 	$(document).ready(function() {
-		var json_to_render = json;
+		var json_to_render = test_json;
 
 		jrender = jRender(json_to_render);
 		jrender.display("#hello_div");
