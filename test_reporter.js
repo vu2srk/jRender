@@ -180,7 +180,7 @@ describe("jRender", function() {
 		it("should create a button if the schema is of type array", function() {
 			expect(jrender.forms["#"]).toBeTruthy();
 			expect(jrender.forms["#"] instanceof jRender.UTILS["Button"]).toBeTruthy();
-			expect($(jrender.forms["#"].html).html()).toEqual("Add Product");
+			expect($(jrender.forms["#"].html).html()).toEqual("<button>Add Product</button>");
 		});
 		it("should recognize an array type even if the type is not explicitly provided", function() {
 			var json = {

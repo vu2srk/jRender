@@ -140,22 +140,118 @@
 				"type" : "object",
 				"properties" : {
 
-					"type" : {
+					"nfs-name" : {
 						"type" : "string"
 					},
 					"self" : {
 						"type" : "array",
 						"items" : {
-							"$ref" : "#"
+							"$ref" : "#/definitions/double"
 						}
 					}
 
 				}
 			}
 		}
+	};
+
+	var object_self_ref_json = {
+		"$schema" : "http://json-schema.org/draft-04/schema#",
+		"title" : "Product set",
+		"type" : "object",
+		"properties" : {
+			"nfs-name" : {
+				"type" : "string"
+			},
+			"self" : {
+				"type" : "object",
+				"$ref" : "#"
+			}
+
+		}
+	};
+
+	var array_self_ref_json = {
+		"$schema" : "http://json-schema.org/draft-04/schema#",
+		"title" : "Product set",
+		"type" : "array",
+		"items" : {
+			"$ref" : "#"
+		}
+	};
+
+	var simple_schema = {
+		"$schema" : "http://json-schema.org/draft-04/schema#",
+		"title" : "Product set",
+		"type" : "array",
+		"items" : {
+			"title" : "Product",
+			"type" : "object",
+			"properties" : {
+				"id" : {
+					"description" : "The unique identifier for a product",
+					"type" : "number"
+				},
+				"name" : {
+					"type" : "string"
+				},
+				"price" : {
+					"type" : "number",
+					"minimum" : 0,
+					"exclusiveMinimum" : true
+				},
+				"tags" : {
+					"type" : "array",
+					"items" : {
+						"type" : "string"
+					},
+					"minItems" : 1,
+					"uniqueItems" : true
+				},
+				"dimensions" : {
+					"type" : "object",
+					"properties" : {
+						"length" : {
+							"type" : "number"
+						},
+						"width" : {
+							"type" : "number"
+						},
+						"height" : {
+							"type" : "number"
+						}
+					},
+					"required" : ["length", "width", "height"]
+				},
+				"warehouseLocation" : {
+					"description" : "Coordinates of the warehouse with the product",
+					"$ref" : "#/definitions/geo"
+				},
+				"SubProduct" : {
+					"description" : "Coordinates of the warehouse with the product",
+					"$ref" : "#"
+				}
+			},
+			"required" : ["id", "name", "price"]
+		},
+		"definitions" : {
+			"geo" : {
+				"description" : "A geographical coordinate",
+				"type" : "object",
+				"properties" : {
+					"latitude" : {
+						"type" : "number"
+					},
+					"longitude" : {
+						"type" : "number"
+					}
+				}
+			}
+		}
 	}
+
 	$(document).ready(function() {
-		var json_to_render = test_json;
+		var json_to_render = simple_schema;
 
 		jrender = jRender(json_to_render);
 		jrender.display("#hello_div");
