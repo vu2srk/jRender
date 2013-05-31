@@ -56,9 +56,11 @@
 			var me = this;
 			var recognized_type;
 			
+			root = root.split("|")[0];
+
 			if (path != "")
 				path += "/";
-			path +=  root;
+			path += root;
 
 			if (!_fragment.type) {
 				recognized_type = this.getFormType(_fragment);
@@ -77,7 +79,7 @@
 						var html;
 						if (me.forms[next_root] instanceof jRender.UTILS["Button"])
 							html = new Button(null, me.forms[next_root].html.clone(true));
-						else if (me.forms[next_root] instanceof jRender.UTILS["Form"]){
+						else if (me.forms[next_root] instanceof jRender.UTILS["Form"]) {
 							html = __handleObjectSelfReference__(root, me.forms, next_root);
 							html.addClass("indent");
 						}
@@ -85,8 +87,10 @@
 						return html;
 					}
 					items = this.getRefSchema(ref_path_parts);
+					var $ref = ref_path_parts.slice(ref_path_parts.length - 2, 1);
+					$ref = $ref.join("/");
 					_fragment = items;
-					this.forms[root] = this.createForms(next_root, _fragment, path);
+					this.forms[root] = this.createForms(next_root, _fragment, $ref);
 				} else {
 					items = _fragment.items;
 					next_root = items.title || root + "_items";
@@ -117,13 +121,15 @@
 					var isSelfReference = __detectSelfReferencing__(path, _fragment.$ref);
 					var ref_path_parts = _fragment.$ref.split("/");
 					next_root = ref_path_parts[ref_path_parts.length - 1];
-					if (isSelfReference){
+					if (isSelfReference) {
 						var html = __handleObjectSelfReference__(root, me.forms, next_root);
 						this.forms[root] = html;
 						return html;
 					}
 					_fragment = this.getRefSchema(ref_path_parts);
-					sub_form = this.createForms(next_root, _fragment, path);
+					var $ref = ref_path_parts.slice(ref_path_parts.length - 2, 1);
+					$ref = $ref.join("/");
+					sub_form = this.createForms(next_root, _fragment, $ref);
 					form.html.append(sub_form.html);
 				} else {
 					for (var prop in properties) {
@@ -145,8 +151,8 @@
 			$(hook).append(this.forms["#"].html.clone(true));
 		}
 	}
-	
-	var __handleObjectSelfReference__ = function(root, forms, next_root){
+
+	var __handleObjectSelfReference__ = function(root, forms, next_root) {
 		var html;
 		var button = new Button(root);
 		$(button.html.find("button")).on("click", function(e) {
@@ -156,14 +162,13 @@
 		html = button;
 		return html;
 	}
-	
-	var __updatePath__ = function(path, $ref){
+	var __updatePath__ = function(path, $ref) {
 		var ref_path_parts = $ref.split("/");
 		var path_parts = path.split("/");
-		for (var i=0; i<ref_path_parts.length - 1; i++){
+		for (var i = 0; i < ref_path_parts.length - 1; i++) {
 			if (i < path_parts.length)
 				path_parts[i] = ref_path_parts[i];
-			else 
+			else
 				path_parts.push(ref_path_parts[i]);
 		}
 		return path_parts.join("/");
@@ -175,21 +180,21 @@
 		}
 		return false;
 	};
-	
+
 	var Button = function(button_text, button) {
-		if (!button){
+		if (!button) {
 			var div = jQuery("<div>");
 			button = jQuery("<button>").html("Add " + button_text);
 			div.append(button);
 		}
 		this.html = div || button;
 	};
-	
+
 	var Form = function(name) {
 		this.name = name;
 		this.html = jQuery("<div>");
 	};
-	
+
 	var Field = function(name, type) {
 		this.name = name;
 		this.type = type;

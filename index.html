@@ -351,7 +351,7 @@
 			}
 		}
 	}
-	
+
 	var root_is_ref = {
 		"$schema" : "http://json-schema.org/draft-04/schema#",
 		"title" : "Product set",
@@ -375,8 +375,203 @@
 		}
 	}
 
+	var meta_data_schema = {
+		"Condition" : {
+			"title" : "Condition",
+			"properties" : {
+				"Name" : {
+					"type" : "string"
+				}
+			},
+			"type" : "object"
+		},
+		"Service" : {
+			"title" : "Service",
+			"properties" : {
+				"Name" : {
+					"type" : "string"
+				},
+				"Description" : {
+					"type" : "string"
+				},
+				"Model|Service" : {
+					"items" : {
+						"$ref" : "#/Model"
+					},
+					"type" : "array"
+				},
+				"Method|Service" : {
+					"items" : {
+						"$ref" : "#/Method"
+					},
+					"type" : "array"
+				}
+			},
+			"type" : "object"
+		},
+		"Model" : {
+			"title" : "Model",
+			"properties" : {
+				"Name" : {
+					"type" : "string"
+				},
+				"ProcessDefinition|Model" : {
+					"items" : {
+						"$ref" : "#/ProcessDefinition"
+					},
+					"type" : "array"
+				},
+				"Attribute|Model" : {
+					"items" : {
+						"$ref" : "#/Attribute"
+					},
+					"type" : "array"
+				}
+			},
+			"type" : "object"
+		},
+		"Formula" : {
+			"title" : "Formula",
+			"properties" : {
+				"Name" : {
+					"type" : "string"
+				},
+				"Node|Formula" : {
+					"items" : {
+						"$ref" : "#/Node"
+					},
+					"type" : "array"
+				}
+			},
+			"type" : "object"
+		},
+		"Method" : {
+			"title" : "Method",
+			"properties" : {
+				"Name" : {
+					"type" : "string"
+				},
+				"Description" : {
+					"type" : "string"
+				}
+			},
+			"type" : "object"
+		},
+		"$ref" : "#/Project",
+		"Criteria" : {
+			"title" : "Criteria",
+			"properties" : {
+				"Name" : {
+					"type" : "string"
+				}
+			},
+			"type" : "object"
+		},
+		"ProcessDefinition" : {
+			"title" : "ProcessDefinition",
+			"properties" : {
+				"Name" : {
+					"type" : "string"
+				},
+				"ProcessType" : {
+					"type" : "string"
+				},
+				"Documentation" : {
+					"type" : "string"
+				}
+			},
+			"type" : "object"
+		},
+		"$schema" : "",
+		"Node" : {
+			"title" : "Node",
+			"properties" : {
+				"Name" : {
+					"type" : "string"
+				},
+				"DoubleValue" : {
+					"type" : "number"
+				},
+				"Type" : {
+					"type" : "string"
+				},
+				"Node|Node" : {
+					"items" : {
+						"$ref" : "#/Node"
+					},
+					"type" : "array"
+				},
+				"StringValue" : {
+					"type" : "string"
+				}
+			},
+			"type" : "object"
+		},
+		"Attribute" : {
+			"title" : "Attribute",
+			"properties" : {
+				"Name" : {
+					"type" : "string"
+				},
+				"Category" : {
+					"type" : "string"
+				},
+				"Format" : {
+					"type" : "string"
+				},
+				"Formula|Attribute" : {
+					"items" : {
+						"$ref" : "#/Formula"
+					},
+					"type" : "array"
+				},
+				"CharacterLength" : {
+					"Format" : "####",
+					"type" : "number"
+				},
+				"IsString" : {
+					"Format" : "True/False",
+					"type" : "boolean"
+				},
+				"DefaultValue" : {
+					"type" : "string"
+				},
+				"IsCascade" : {
+					"Format" : "True/False",
+					"type" : "boolean"
+				}
+			},
+			"type" : "object"
+		},
+		"Project" : {
+			"title" : "Project",
+			"properties" : {
+				"Name" : {
+					"type" : "string"
+				},
+				"Description" : {
+					"type" : "string"
+				},
+				"Service|Project" : {
+					"items" : {
+						"$ref" : "#/Service"
+					},
+					"type" : "array"
+				},
+				"Model|Project" : {
+					"items" : {
+						"$ref" : "#/Model"
+					},
+					"type" : "array"
+				}
+			},
+			"type" : "object"
+		}
+
+	}
+
 	$(document).ready(function() {
-		var json_to_render = advanced_schema;
+		var json_to_render = meta_data_schema;
 
 		jrender = jRender(json_to_render);
 		jrender.display("#hello_div");
