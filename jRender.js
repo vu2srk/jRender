@@ -7,7 +7,7 @@
 	jRender.ARRAY = "array";
 	jRender.OBJECT = "object";
 	jRender.INPUT = "input";
-
+	
 	jRender.fn = jRender.prototype = {
 		init : function(json) {
 
@@ -57,7 +57,7 @@
 			var recognized_type;
 			
 			root = root.split("|")[0];
-
+		
 			if (path != "")
 				path += "/";
 			path += root;
@@ -70,27 +70,27 @@
 
 			if (recognized_type == jRender.ARRAY) {
 				var items;
-				if (_fragment.$ref) {
-					path = __updatePath__(path, _fragment.$ref);
-					var _isSelfReference = __detectSelfReferencing__(path, _fragment.$ref);
-					var ref_path_parts = _fragment.$ref.split("/");
+				if (!_fragment.items){
+					throw new Error("Please check your Schema");
+				}
+				if (_fragment.items.$ref) {
+					//to enable cyclic reference handling and self reference handling
+					//we render a button for every array and continue execution on button click
+					var ref_path_parts = _fragment.items.$ref.split("/");
+					var items = me.getRefSchema(ref_path_parts);
 					next_root = ref_path_parts[ref_path_parts.length - 1];
-					if (_isSelfReference) {
-						var html;
-						if (me.forms[next_root] instanceof jRender.UTILS["Button"])
-							html = new Button(null, me.forms[next_root].html.clone(true));
-						else if (me.forms[next_root] instanceof jRender.UTILS["Form"]) {
-							html = __handleObjectSelfReference__(root, me.forms, next_root);
-							html.addClass("indent");
-						}
-						this.forms[root] = html;
-						return html;
-					}
-					items = this.getRefSchema(ref_path_parts);
 					var $ref = ref_path_parts.slice(ref_path_parts.length - 2, 1);
 					$ref = $ref.join("/");
-					_fragment = items;
-					this.forms[root] = this.createForms(next_root, _fragment, $ref);
+					var button = new Button(next_root);
+					$(button.html.find("button")).on("click", function(e) {
+						e.preventDefault();
+						var _tiny_fragment = _fragment;
+						_tiny_fragment = items;
+						me.createForms(next_root, _tiny_fragment, $ref);
+						$(this.parentNode).append(me.forms[next_root].html.clone(true).addClass("indent"));
+					});
+					this.forms[root] = button;
+					return button;
 				} else {
 					items = _fragment.items;
 					next_root = items.title || root + "_items";

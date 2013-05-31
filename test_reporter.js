@@ -250,30 +250,6 @@ describe("jRender", function() {
 			expect(jrender.forms["#"]).toBeTruthy();
 			expect(jrender.forms["#_items"]).toBeTruthy();
 		});
-		it("should create form html for the item schema of the array with a $ref", function() {
-			var json = {
-				"$schema" : "http://json-schema.org/draft-04/schema#",
-				"title" : "Product set",
-				"type" : "array",
-				"items" : {
-					"$ref" : "#/definitions/nfs"
-				},
-				"definitions" : {
-					"nfs" : {
-						"properties" : {
-							"type" : {
-								"type" : "string"
-							}
-						}
-					}
-				}
-			};
-			var jrender = jRender(json);
-			expect(jrender.forms["#"]).toBeTruthy();
-			expect(jrender.forms["#_items"]).toBeTruthy();
-			var form_html = '<div><input placeholder="type"></div>';
-			expect($(jrender.forms["#_items"].html).html()).toEqual(form_html);
-		});
 	})
 });
 

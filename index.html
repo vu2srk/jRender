@@ -229,7 +229,9 @@
 				},
 				"SubProduct" : {
 					"description" : "Coordinates of the warehouse with the product",
-					"$ref" : "#"
+					"items" : {
+						"$ref" : "#"
+					}
 				}
 			},
 			"required" : ["id", "name", "price"]
@@ -375,7 +377,8 @@
 		}
 	}
 
-	var meta_data_schema = {
+	//this exhibits cyclic reference -- ProcessDefinition and FLowNode reference each other
+	var test_meta_schema = {
 		"Condition" : {
 			"title" : "Condition",
 			"properties" : {
@@ -458,6 +461,39 @@
 			"type" : "object"
 		},
 		"$ref" : "#/Project",
+		"FlowNode" : {
+			"title" : "FlowNode",
+			"properties" : {
+				"Name" : {
+					"type" : "string"
+				},
+				"Documentation" : {
+					"type" : "string"
+				},
+				"Type" : {
+					"type" : "string"
+				},
+				"NodeType" : {
+					"type" : "string"
+				},
+				"Role" : {
+					"type" : "string"
+				},
+				"Formula|FlowNode" : {
+					"items" : {
+						"$ref" : "#/Formula"
+					},
+					"type" : "array"
+				},
+				"ProcessDefinition|FlowNode" : {
+					"items" : {
+						"$ref" : "#/ProcessDefinition"
+					},
+					"type" : "array"
+				}
+			},
+			"type" : "object"
+		},
 		"Criteria" : {
 			"title" : "Criteria",
 			"properties" : {
@@ -478,6 +514,12 @@
 				},
 				"Documentation" : {
 					"type" : "string"
+				},
+				"FlowNode|ProcessDefinition" : {
+					"items" : {
+						"$ref" : "#/FlowNode"
+					},
+					"type" : "array"
 				}
 			},
 			"type" : "object"
@@ -567,41 +609,10 @@
 			},
 			"type" : "object"
 		}
-	}
-
-	/* This throws a cyclic reference problem because of how FlowNode and ProcessDefinition reference
-	 * each other
-	 var meta_data_schema = {
-	 "$ref" : "#/Project",
-	 "FlowNode" : {
-	 "title" : "FlowNode",
-	 "properties" : {
-	 "ProcessDefinition|FlowNode" : {
-	 "items" : {
-	 "$ref" : "#/ProcessDefinition"
-	 },
-	 "type" : "array"
-	 }
-	 },
-	 "type" : "object"
-	 },
-	 "ProcessDefinition" : {
-	 "title" : "ProcessDefinition",
-	 "properties" : {
-
-	 "FlowNode|ProcessDefinition" : {
-	 "items" : {
-	 "$ref" : "#/FlowNode"
-	 },
-	 "type" : "array"
-	 }
-	 },
-	 "type" : "object"
-	 }
-	 }*/
+	};
 
 	$(document).ready(function() {
-		var json_to_render = meta_data_schema;
+		var json_to_render = test_meta_schema;
 
 		jrender = jRender(json_to_render);
 		jrender.display("#hello_div");
