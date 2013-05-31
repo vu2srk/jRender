@@ -1,4 +1,28 @@
 describe("jRender", function() {
+	describe("__detectSelfReferencing__", function(){
+		it("should detect if there's a self reference", function(){
+			var path = "#/definitions/nfs-name/self";
+			var ref = "#/definitions";
+			expect(jRender.UTILS["__detectSelfReferencing__"](path, ref)).toBeTruthy();
+			
+			ref = "#";
+			expect(jRender.UTILS["__detectSelfReferencing__"](path, ref)).toBeTruthy();
+			
+			ref = "#/Product";
+			expect(jRender.UTILS["__detectSelfReferencing__"](path, ref)).toBeFalsy();
+		});
+	});
+	describe("__updatePath__", function(){
+		it("update current path with ref path", function(){
+			var path = "#/#_items/nfs-name/self";
+			var ref = "#/definitions/nfs-name";
+			expect(jRender.UTILS["__updatePath__"](path, ref)).toEqual("#/definitions/nfs-name/self");
+			
+			path = "#/#_items/nfs-name";
+			ref = "#/definitions/nfs-name/self/root";
+			expect(jRender.UTILS["__updatePath__"](path, ref)).toEqual("#/definitions/nfs-name/self");
+		});
+	});
 	describe("jRender init", function() {
 		it("should instantiate an instance of jRender", function() {
 			var jrender = jRender({

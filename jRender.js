@@ -200,7 +200,9 @@
 	jRender.UTILS = {
 		"Form" : Form,
 		"Button" : Button,
-		"Field" : Field
+		"Field" : Field,
+		"__detectSelfReferencing__" : __detectSelfReferencing__,
+		"__updatePath__" : __updatePath__
 	};
 
 	jRender.fn.init.prototype = jRender.prototype;
