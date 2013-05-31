@@ -567,8 +567,38 @@
 			},
 			"type" : "object"
 		}
-
 	}
+
+	/* This throws a cyclic reference problem because of how FlowNode and ProcessDefinition reference
+	 * each other
+	 var meta_data_schema = {
+	 "$ref" : "#/Project",
+	 "FlowNode" : {
+	 "title" : "FlowNode",
+	 "properties" : {
+	 "ProcessDefinition|FlowNode" : {
+	 "items" : {
+	 "$ref" : "#/ProcessDefinition"
+	 },
+	 "type" : "array"
+	 }
+	 },
+	 "type" : "object"
+	 },
+	 "ProcessDefinition" : {
+	 "title" : "ProcessDefinition",
+	 "properties" : {
+
+	 "FlowNode|ProcessDefinition" : {
+	 "items" : {
+	 "$ref" : "#/FlowNode"
+	 },
+	 "type" : "array"
+	 }
+	 },
+	 "type" : "object"
+	 }
+	 }*/
 
 	$(document).ready(function() {
 		var json_to_render = meta_data_schema;
