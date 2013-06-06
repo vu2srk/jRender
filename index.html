@@ -612,10 +612,10 @@
 	};
 
 	$(document).ready(function() {
-		var json_to_render = test_meta_schema;
+		var json_to_render = array_self_ref_json;
 
-		jrender = jRender(json_to_render);
-		jrender.display("#hello_div");
+		jrender = jRender(json_to_render, "Meta");
+		//jrender.display("#hello_div");
 	})
 
 </script>
