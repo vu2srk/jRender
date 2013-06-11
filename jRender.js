@@ -1,7 +1,7 @@
 (function(window) {
 
-	var jRender = function(json, form_root, hook) {
-		return new jRender.fn.init(json, form_root, hook);
+	var jRender = function(json, options) {
+		return new jRender.fn.init(json, options);
 	};
 	
 	var _in_process = {};
@@ -11,14 +11,14 @@
 	jRender.INPUT = "input";
 
 	jRender.fn = jRender.prototype = {
-		init : function(json, form_root, hook) {
+		init : function(json, options) {
 
 			if ( typeof (json) === "undefined")
 				json = {};
 
 			this.schema = json;
 			this.root_type = json.type || this.getFormType(json);
-			this.root = form_root || json.title;
+			this.root = options.root || json.title;
 			if (!this.root){
 				throw new Error("Please provide a root form title");
 			}
@@ -32,7 +32,7 @@
 				this.form_sections[this.root].fields.push(main_form);
 			}
 			
-			this.draw(this.root, hook);
+			this.draw(this.root, options.hook);
 		},
 		
 		draw : function(root, hook){

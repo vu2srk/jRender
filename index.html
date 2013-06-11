@@ -569,7 +569,7 @@
 				},
 				"IsCascade" : {
 					"Format" : "True/False",
-					"type" : "boolean"
+					"type" : "boolean",
 				}
 			},
 			"type" : "object"
@@ -603,7 +603,14 @@
 	$(document).ready(function() {
 		var json_to_render = test_meta_schema;
 
-		jrender = jRender(json_to_render, "Meta", "#hello_div");
+		options = {
+			"method" : "",
+			"action" : "",
+			"root" : "Meta",
+			"hook" : "#hello_div"
+		};
+
+		jrender = jRender(json_to_render, options);
 	})
 
 </script>
