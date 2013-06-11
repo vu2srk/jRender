@@ -11,10 +11,16 @@ input {
 	outline: none;
 }
 
+div {
+	display : table;
+}
+
 h4 {
 	font-size: 14px;
 	color: #333333;
 	padding: 5px;
+	border-bottom:1px gray solid;
+	width:100%;
 }
 
 button {

@@ -38,6 +38,8 @@
 		draw : function(root, hook){
 			var fields = this.form_sections[root].fields;
 			var form_section_div = this.form_sections[root].html;
+			var title = jQuery("<h4>").html(root);
+			form_section_div.append(title);
 			for (var i=0; i<fields.length; i++){
 				var field_div = jQuery("<div>");
 				if (fields[i] instanceof FormSection){
@@ -196,6 +198,7 @@
 	FormSection.prototype.setHTML = function(){
 		var html = jQuery("<div>");
 		html.attr("name", this.name)
+		html.addClass("indent");
 		this.html = html;
 	}
 
