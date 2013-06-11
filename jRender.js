@@ -1,17 +1,17 @@
 (function(window) {
 
-	var jRender = function(json, form_root) {
-		return new jRender.fn.init(json, form_root);
+	var jRender = function(json, form_root, hook) {
+		return new jRender.fn.init(json, form_root, hook);
 	};
 	
-	var __in_process__ = {};
+	var _in_process = {};
 
 	jRender.ARRAY = "array";
 	jRender.OBJECT = "object";
 	jRender.INPUT = "input";
 
 	jRender.fn = jRender.prototype = {
-		init : function(json, form_root) {
+		init : function(json, form_root, hook) {
 
 			if ( typeof (json) === "undefined")
 				json = {};
@@ -22,9 +22,32 @@
 			if (!this.root){
 				throw new Error("Please provide a root form title");
 			}
-			this.form_order = [];
-			this.forms = {};
-			this.parse(this.root, this.schema);
+			
+			this.form_sections = {};
+			
+			//if the root form is an array and no forms have been created;
+			var main_form = this.parse(this.root, this.schema);
+			if (!this.form_sections[this.root]){
+				this.form_sections[this.root] = new FormSection(this.root);
+				this.form_sections[this.root].fields.push(main_form);
+			}
+			
+			this.draw(this.root, hook);
+		},
+		
+		draw : function(root, hook){
+			var fields = this.form_sections[root].fields;
+			var form_section_div = this.form_sections[root].html;
+			for (var i=0; i<fields.length; i++){
+				var field_div = jQuery("<div>");
+				if (fields[i] instanceof FormSection){
+					this.draw(fields[i].name, field_div);
+				} else {
+					field_div.append(fields[i].html);
+				}
+				form_section_div.append(field_div);
+			}
+			$(hook).append(form_section_div);
 		},
 
 		getRefSchema : function(ref_path_parts) {
@@ -61,27 +84,22 @@
 			return type;
 		},
 		
-		__createButtonToHandleRef__ : function(root, _fragment, _is_headless){
-			var button_for_render = new Button(root);
-			this.form_order.push(root + "_button");
-			this.forms[root + "_button"] = button_for_render;
-			//this.__addButtonHandler__(button_for_render, _fragment);
+		_createButtonToHandleRef : function(root, _fragment, type){
+			var button_for_render = new Button(_fragment.title || root);
+			var me = this;
+			var _buttonClickHandler = function(){
+				me.form_sections[root] = new FormSection(root);
+				me.form_sections[root].fields.push(me.parse(root, _fragment));
+				me.draw(root, this.parentNode);
+				if (type == jRender.OBJECT){
+					this.parentNode.children[0].remove();
+				}
+			};
+			button_for_render.addEventHandler("click", _buttonClickHandler);
 			return button_for_render;
 		},
-
-		parse : function(root, _fragment) {
-			var type = this.getFormType(_fragment);
-			var _is_ref = false;
-			
-			var $ref = _fragment.$ref || null;
-			var next_root;
-	
-			while($ref){
-				var ref_path_parts = $ref.split("/");
-				_fragment = this.getRefSchema(ref_path_parts);
-				$ref = _fragment.$ref || (_fragment.items && _fragment.items.$ref) || null;
-			}
-			
+		
+		validate : function(type, _fragment){
 			if (type == jRender.ARRAY && !_fragment.items){
 				throw new Error("Please check schema. Array has no items");
 			}
@@ -93,58 +111,111 @@
 			if (type != this.getFormType(_fragment)){
 				throw new Error("Type mismatch");
 			}
+		},
+
+		parse : function(root, _fragment) {
+			
+			var type = this.getFormType(_fragment);
+			var _is_ref = false;
+			
+			var $ref = _fragment.$ref || (_fragment.items && _fragment.items.$ref) || null;
+			var _fragment_from_ref;
+			var next_root;
+			
+			if($ref){
+				var ref_path_parts = $ref.split("/");
+				_fragment_from_ref = this.getRefSchema(ref_path_parts);
+			}
 			
 			if (type == jRender.ARRAY){
 				
-				if (this.getFormType(_fragment))
-				return this.__createButtonToHandleRef__(root, _fragment, true);
+				this.validate(type, _fragment);
+				return this._createButtonToHandleRef(root, _fragment_from_ref || _fragment.items, type);
 				
 			} else if (type == jRender.OBJECT){
-				if (!__in_process__[root]){
-					__in_process__[root] = true;
-					this.forms[root] = new Form(root);
+				if (!_in_process[root]){
+					_in_process[root] = true;
+					if($ref){
+						_fragment = _fragment_from_ref;
+						this.parse(root, _fragment);
+					}
+					this.validate(type, _fragment);
+					this.form_sections[root] = new FormSection(root);
 					for (prop in _fragment.properties){
 						next_root = prop;
-						this.forms[root].fields.push(this.parse(next_root, _fragment.properties[prop]));
+						this.form_sections[root].fields.push(this.parse(next_root, _fragment.properties[prop]));
 					}
-					__in_process__[root] = false;
+					_in_process[root] = false;
+					return this.form_sections[root];
 				} else {
-					return this.__createButtonToHandleRef__(root, _fragment);
+
+					return this._createButtonToHandleRef(root, _fragment, type);
 				}
 				
 			} else {
 				return new Field(root, _fragment.type);
 			}
-		},
-
-		display : function(hook) {
-			$(hook).append(this.forms["#"].html.clone(true));
+		}
+	};
+	
+	var DOMElement = function(){
+		
+	};
+	
+	DOMElement.prototype = {
+		setHTML : function(){
+			
 		}
 	};
 
-	var Button = function(button_text, button) {
-		if (!button) {
-			var div = jQuery("<div>");
-			button = jQuery("<button>").html("Add " + button_text);
-			div.append(button);
-		}
-		this.html = div || button;
+	var Button = function(button_text) {
+		this.name = button_text;
+		this.setHTML();
 	};
+	
+	Button.prototype = new DOMElement;
+	
+	Button.prototype.setHTML = function(){
+		var html = jQuery("<button>");
+		html.html(this.name);
+		this.html = html;
+	}
+	
+	Button.prototype.addEventHandler = function(event, handler){
+		this.html.on(event, handler);
+	}
 
-	var Form = function(name) {
+	var FormSection = function(name) {
 		this.name = name;
 		this.fields = [];
+		this.setHTML();
 	};
+	
+	FormSection.prototype = new DOMElement;
+	
+	FormSection.prototype.setHTML = function(){
+		var html = jQuery("<div>");
+		html.attr("name", this.name)
+		this.html = html;
+	}
 
 	var Field = function(name, type, options) {
 		this.name = name;
 		this.type = type;
 		if (options)
 			this.options = options;
+		this.setHTML();
 	};
+	
+	Field.prototype = new DOMElement;
+	
+	Field.prototype.setHTML = function(){
+		var html = jQuery("<input>").attr("placeholder", this.name);
+		this.html = html;
+	}
 
 	jRender.UTILS = {
-		"Form" : Form,
+		"Form" : FormSection,
 		"Button" : Button,
 		"Field" : Field
 	};
