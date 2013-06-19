@@ -86,10 +86,3 @@ options = {
 
 jrender = jRender(json_to_render, options);
 </code></pre> 
-
-####Output #####
-
-<form method="" action="" name="Personal Details"><div id="hello_div">
-
-    	<div name="Personal Details" class="indent"><h4>Personal Details</h4><div><input placeholder="First Name"></div><div><input placeholder="Last Name"></div><div><button>Address</button></div><div><input placeholder="Age"></div><div><div><h4>Interests</h4><input type="checkbox" name="Interests" value="Sports">Sports<br><input type="checkbox" name="Interests" value="Music">Music<br><input type="checkbox" name="Interests" value="Movies">Movies<br><input type="checkbox" name="Interests" value="Food">Food<br><input type="checkbox" name="Interests" value="Fashion">Fashion<br><input type="checkbox" name="Interests" value="Technology">Technology<br><input type="checkbox" name="Interests" value="Business">Business<br></div></div><div><div><h4>Gender</h4><input type="radio" name="Gender" value="Male">Male<br><input type="radio" name="Gender" value="Female">Female<br></div></div></div></div></form>
-
