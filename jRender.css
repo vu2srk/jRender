@@ -9,11 +9,13 @@ input {
 	border-radius: 5px;
 	padding: 2px;
 	outline: none;
+	font-size : 12px;
 }
 
 div {
 	display : table;
 	font-size : 13px;
+	padding : 5px;
 }
 
 h4 {

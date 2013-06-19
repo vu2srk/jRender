@@ -1,613 +1,68 @@
 <script src="lib/jquery.js" type="text/javascript"></script>
 <script src="jRender.js" type="text/javascript"></script>
 <script type="text/javascript">
-	var json_ref = {
-		"$schema" : "http://json-schema.org/draft-04/schema#",
-		"title" : "File System",
-		"type" : "object",
-		"properties" : {
-			"storage" : {
-				"type" : "object",
-				"$ref" : "#/definitions/nfs"
-			}
-		},
-		"definitions" : {
-			"nfs" : {
-				"properties" : {
-					"type" : {
-						"type" : "string"
-					},
-					"time" : {
-						"type" : "array",
-						"items" : {
-							"title" : "Product",
-							"type" : "object",
-							"properties" : {
-								"id" : {
-									"description" : "The unique identifier for a product",
-									"type" : "number"
-								},
-								"name" : {
-									"type" : "string"
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	};
-
-	var array_ref_json = {
-		"$schema" : "http://json-schema.org/draft-04/schema#",
-		"title" : "Product set",
-		"type" : "array",
-		"items" : {
-			"$ref" : "#/definitions/nfs"
-		},
-		"definitions" : {
-			"nfs" : {
-				"properties" : {
-					"type" : {
-						"type" : "string"
-					}
-				}
-			}
-		}
-	};
-
-	var json = {
-		"$schema" : "http://json-schema.org/draft-04/schema#",
-		"title" : "File System",
-		"type" : "object",
-		"properties" : {
-			"storage" : {
-				"properties" : {
-					"type" : {
-						"type" : "string"
-					},
-					"remotePath" : {
-						"type" : "string"
-					}
-				}
-			},
-			"time" : {
-				"items" : {
-					"title" : "Product",
-					"type" : "object",
-					"properties" : {
-						"id" : {
-							"description" : "The unique identifier for a product",
-							"type" : "number"
-						},
-						"name" : {
-							"type" : "string"
-						},
-						"day" : {
-							"type" : "array",
-							"items" : {
-								"title" : "Day",
-								"type" : "object",
-								"properties" : {
-									"month" : {
-										"description" : "The unique identifier for a product",
-										"type" : "number"
-									},
-									"year" : {
-										"type" : "string"
-									}
-								}
-							}
-						},
-						"something" : {
-							"type" : "array",
-							"items" : {
-								"$ref" : "#/definitions/nfs"
-							}
-						}
-					}
-				}
-			}
-		},
-		"definitions" : {
-			"nfs" : {
-				"properties" : {
-					"type" : {
-						"type" : "string"
-					}
-				}
-			}
-		}
-	};
-
-	var test_json = {
-		"$schema" : "http://json-schema.org/draft-04/schema#",
-		"title" : "Product set",
-		"type" : "array",
-		"items" : {
-			"$ref" : "#/definitions/double"
-		},
-		"definitions" : {
-			"nfs" : {
-				"properties" : {
-					"type" : {
-						"type" : "string"
-					}
-				}
-			},
-			"double" : {
-				"type" : "object",
-				"properties" : {
-
-					"nfs-name" : {
-						"type" : "string"
-					},
-					"self" : {
-						"type" : "array",
-						"items" : {
-							"$ref" : "#/definitions/double"
-						}
-					}
-
-				}
-			}
-		}
-	};
-
-	var object_self_ref_json = {
-		"$schema" : "http://json-schema.org/draft-04/schema#",
-		"title" : "Product set",
-		"type" : "object",
-		"properties" : {
-			"nfs-name" : {
+	
+	var personal_details_schema = {
+		type : "object",
+		title :"Personal Details",
+		properties : {
+			"First Name" : {
 				"type" : "string"
 			},
-			"self" : {
-				"type" : "object",
-				"$ref" : "#"
+			"Last Name" : {
+				"type" : "string"
+			},
+			"Address" : {
+				"type" : "array",
+				"items" : {
+					"$ref" : "#/definitions/address_object"
+				}
+			},
+			"Age" : {
+				"type" : "string"
+			},
+			"Interests" : {
+				"enum" : ["Sports", "Music", "Movies", "Food", "Fashion", "Technology", "Business"]
+			},
+			"Gender" : {
+				"type" : "boolean",
+				"format" : "Male/Female"
 			}
-
-		}
-	};
-
-	var array_self_ref_json = {
-		"$schema" : "http://json-schema.org/draft-04/schema#",
-		"title" : "Product set",
-		"type" : "array",
-		"items" : {
-			"$ref" : "#"
-		}
-	};
-
-	var simple_schema = {
-		"$schema" : "http://json-schema.org/draft-04/schema#",
-		"title" : "Product set",
-		"type" : "array",
-		"items" : {
-			"title" : "Product",
-			"type" : "object",
-			"properties" : {
-				"id" : {
-					"description" : "The unique identifier for a product",
-					"type" : "number"
-				},
-				"name" : {
-					"type" : "string"
-				},
-				"price" : {
-					"type" : "number",
-					"minimum" : 0,
-					"exclusiveMinimum" : true
-				},
-				"tags" : {
-					"type" : "array",
-					"items" : {
+		},
+		"definitions" : {
+			"address_object" : {
+				"properties" : {
+					"Door No." : {
 						"type" : "string"
 					},
-					"minItems" : 1,
-					"uniqueItems" : true
-				},
-				"dimensions" : {
-					"type" : "object",
-					"properties" : {
-						"length" : {
-							"type" : "number"
-						},
-						"width" : {
-							"type" : "number"
-						},
-						"height" : {
-							"type" : "number"
-						}
+					"Street Name" : {
+						"type" : "string"
 					},
-					"required" : ["length", "width", "height"]
-				},
-				"warehouseLocation" : {
-					"description" : "Coordinates of the warehouse with the product",
-					"$ref" : "#/definitions/geo"
-				},
-				"SubProduct" : {
-					"description" : "Coordinates of the warehouse with the product",
-					"items" : {
-						"$ref" : "#"
-					}
-				}
-			},
-			"required" : ["id", "name", "price"]
-		},
-		"definitions" : {
-			"geo" : {
-				"description" : "A geographical coordinate",
-				"type" : "object",
-				"properties" : {
-					"latitude" : {
-						"type" : "number"
+					"City" : {
+						"type" : "string"
 					},
-					"longitude" : {
-						"type" : "number"
+					"Country" : {
+						"type" : "string"
+					},
+					"PIN" : {
+						"type" : "string"
 					}
 				}
 			}
-		}
-	}
-
-	var advanced_schema = {
-		"id" : "http://some.site.somewhere/entry-schema#",
-		"$schema" : "http://json-schema.org/draft-04/schema#",
-		"description" : "schema for an fstab entry",
-		"type" : "object",
-		"required" : ["storage"],
-		"properties" : {
-			"storage" : {
-				"type" : "object",
-				"$ref" : "#/definitions/nfs"
-			},
-			"fstype" : {
-				"enum" : ["ext3", "ext4", "btrfs"]
-			},
-			"options" : {
-				"type" : "array",
-				"minItems" : 1,
-				"items" : {
-					"type" : "string"
-				},
-				"uniqueItems" : true
-			},
-			"readonly" : {
-				"type" : "boolean"
-			}
-		},
-		"definitions" : {
-			"diskDevice" : {
-				"properties" : {
-					"type" : {
-						"enum" : ["disk"]
-					},
-					"device" : {
-						"type" : "string",
-						"pattern" : "^/dev/[^/]+(/[^/]+)*$"
-					}
-				},
-				"required" : ["type", "device"],
-				"additionalProperties" : false
-			},
-			"diskUUID" : {
-				"properties" : {
-					"type" : {
-						"enum" : ["disk"]
-					},
-					"label" : {
-						"type" : "string",
-						"pattern" : "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
-					}
-				},
-				"required" : ["type", "label"],
-				"additionalProperties" : false
-			},
-			"nfs" : {
-				"properties" : {
-					"remotePath" : {
-						"type" : "string",
-						"pattern" : "^(/[^/]+)+$"
-					},
-					"server" : {
-						"type" : "string",
-						"oneOf" : [{
-							"format" : "host-name"
-						}, {
-							"format" : "ipv4"
-						}, {
-							"format" : "ipv6"
-						}]
-					}
-				},
-				"required" : ["type", "server", "remotePath"],
-				"additionalProperties" : false
-			},
-			"tmpfs" : {
-				"properties" : {
-					"type" : {
-						"enum" : ["tmpfs"]
-					},
-					"sizeInMB" : {
-						"type" : "integer",
-						"minimum" : 16,
-						"maximum" : 512
-					}
-				},
-				"required" : ["type", "sizeInMB"],
-				"additionalProperties" : false
-			}
-		}
-	}
-
-	var root_is_ref = {
-		"$schema" : "http://json-schema.org/draft-04/schema#",
-		"title" : "Product set",
-		"type" : "array",
-		"items" : {
-			"$ref" : "#/definitions/geo"
-		},
-		"definitions" : {
-			"geo" : {
-				"description" : "A geographical coordinate",
-				"type" : "object",
-				"properties" : {
-					"latitude" : {
-						"type" : "number"
-					},
-					"longitude" : {
-						"type" : "number"
-					}
-				}
-			}
-		}
-	}
-
-	//this exhibits cyclic reference -- ProcessDefinition and FLowNode reference each other
-	var test_meta_schema = {
-		"Condition" : {
-			"title" : "Condition",
-			"properties" : {
-				"Name" : {
-					"type" : "string"
-				}
-			},
-			"type" : "object"
-		},
-		"Service" : {
-			"title" : "Service",
-			"properties" : {
-				"Name" : {
-					"type" : "string"
-				},
-				"Description" : {
-					"type" : "string"
-				},
-				"Model|Service" : {
-					"items" : {
-						"$ref" : "#/Model"
-					},
-					"type" : "array"
-				},
-				"Method|Service" : {
-					"items" : {
-						"$ref" : "#/Method"
-					},
-					"type" : "array"
-				}
-			},
-			"type" : "object"
-		},
-		"Model" : {
-			"title" : "Model",
-			"properties" : {
-				"Name" : {
-					"type" : "string"
-				},
-				"ProcessDefinition|Model" : {
-					"items" : {
-						"$ref" : "#/ProcessDefinition"
-					},
-					"type" : "array"
-				},
-				"Attribute|Model" : {
-					"items" : {
-						"$ref" : "#/Attribute"
-					},
-					"type" : "array"
-				}
-			},
-			"type" : "object"
-		},
-		"Formula" : {
-			"title" : "Formula",
-			"properties" : {
-				"Name" : {
-					"type" : "string"
-				},
-				"Node|Formula" : {
-					"items" : {
-						"$ref" : "#/Node"
-					},
-					"type" : "array"
-				}
-			},
-			"type" : "object"
-		},
-		"Method" : {
-			"title" : "Method",
-			"properties" : {
-				"Name" : {
-					"type" : "string"
-				},
-				"Description" : {
-					"type" : "string"
-				}
-			},
-			"type" : "object"
-		},
-		"$ref" : "#/Project",
-		"FlowNode" : {
-			"title" : "FlowNode",
-			"properties" : {
-				"Name" : {
-					"type" : "string"
-				},
-				"Documentation" : {
-					"type" : "string"
-				},
-				"Type" : {
-					"type" : "string"
-				},
-				"NodeType" : {
-					"type" : "string"
-				},
-				"Role" : {
-					"type" : "string"
-				},
-				"Formula|FlowNode" : {
-					"items" : {
-						"$ref" : "#/Formula"
-					},
-					"type" : "array"
-				},
-				"ProcessDefinition|FlowNode" : {
-					"items" : {
-						"$ref" : "#/ProcessDefinition"
-					},
-					"type" : "array"
-				}
-			},
-			"type" : "object"
-		},
-		"Criteria" : {
-			"title" : "Criteria",
-			"properties" : {
-				"Name" : {
-					"type" : "string"
-				}
-			},
-			"type" : "object"
-		},
-		"ProcessDefinition" : {
-			"title" : "ProcessDefinition",
-			"properties" : {
-				"Name" : {
-					"type" : "string"
-				},
-				"ProcessType" : {
-					"type" : "string"
-				},
-				"Documentation" : {
-					"type" : "string"
-				},
-				"FlowNode|ProcessDefinition" : {
-					"items" : {
-						"$ref" : "#/FlowNode"
-					},
-					"type" : "array"
-				}
-			},
-			"type" : "object"
-		},
-		"Node" : {
-			"title" : "Node",
-			"properties" : {
-				"Name" : {
-					"type" : "string"
-				},
-				"DoubleValue" : {
-					"type" : "number"
-				},
-				"Type" : {
-					"type" : "string"
-				},
-				"Node|Node" : {
-					"items" : {
-						"$ref" : "#/Node"
-					},
-					"type" : "array"
-				},
-				"StringValue" : {
-					"type" : "string"
-				}
-			},
-			"type" : "object"
-		},
-		"Attribute" : {
-			"title" : "Attribute",
-			"properties" : {
-				"Name" : {
-					"type" : "string"
-				},
-				"Category" : {
-					"type" : "string"
-				},
-				"Format" : {
-					"type" : "string"
-				},
-				"Formula|Attribute" : {
-					"items" : {
-						"$ref" : "#/Formula"
-					},
-					"type" : "array"
-				},
-				"CharacterLength" : {
-					"Format" : "####",
-					"type" : "number"
-				},
-				"IsString" : {
-					"Format" : "True/False",
-					"type" : "boolean"
-				},
-				"DefaultValue" : {
-					"type" : "string"
-				},
-				"IsCascade" : {
-					"Format" : "True/False",
-					"type" : "boolean",
-				}
-			},
-			"type" : "object"
-		},
-		"Project" : {
-			"title" : "Project",
-			"properties" : {
-				"Name" : {
-					"type" : "something"
-				},
-				"Description" : {
-					"type" : "string"
-				},
-				"Service|Project" : {
-					"items" : {
-						"$ref" : "#/Service"
-					},
-					"type" : "array"
-				},
-				"Model|Project" : {
-					"items" : {
-						"$ref" : "#/Model"
-					},
-					"type" : "array"
-				}
-			},
-			"type" : "object"
 		}
 	};
 
 	$(document).ready(function() {
-		var json_to_render = test_meta_schema;
+		var json_to_render = personal_details_schema;
 
 		options = {
 			"method" : "",
 			"action" : "",
-			"root" : "Meta",
+			"root" : "Personal Details",
 			"hook" : "#hello_div",
 			"render-options" : {
 				"render-types" : {
-					"enum" : "select",
+					"enum" : "checkbox",
 					"boolean" : "radio"
 				}
 			}
