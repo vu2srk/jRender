@@ -1,6 +1,5 @@
 <script src="lib/jquery.js" type="text/javascript"></script>
 <script src="jRender.js" type="text/javascript"></script>
-
 <script type="text/javascript">
 	var json_ref = {
 		"$schema" : "http://json-schema.org/draft-04/schema#",
@@ -264,7 +263,6 @@
 				"$ref" : "#/definitions/nfs"
 			},
 			"fstype" : {
-				"type" : "string",
 				"enum" : ["ext3", "ext4", "btrfs"]
 			},
 			"options" : {
@@ -513,7 +511,6 @@
 			},
 			"type" : "object"
 		},
-		"$schema" : "",
 		"Node" : {
 			"title" : "Node",
 			"properties" : {
@@ -578,7 +575,7 @@
 			"title" : "Project",
 			"properties" : {
 				"Name" : {
-					"type" : "string"
+					"type" : "something"
 				},
 				"Description" : {
 					"type" : "string"
@@ -607,7 +604,13 @@
 			"method" : "",
 			"action" : "",
 			"root" : "Meta",
-			"hook" : "#hello_div"
+			"hook" : "#hello_div",
+			"render-options" : {
+				"render-types" : {
+					"enum" : "select",
+					"boolean" : "radio"
+				}
+			}
 		};
 
 		jrender = jRender(json_to_render, options);

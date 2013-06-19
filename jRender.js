@@ -24,6 +24,7 @@
 			}
 			
 			this.form_sections = {};
+			this.render_options = options["render-options"] || {};
 			
 			//if the root form is an array and no forms have been created;
 			var main_form = this.parse(this.root, this.schema);
@@ -33,6 +34,9 @@
 			}
 			
 			this.draw(this.root, options.hook);
+
+			var form = new Form(this.root, options.method, options.action);
+			$(options.hook).wrap(form.html);
 		},
 		
 		draw : function(root, hook){
@@ -49,6 +53,7 @@
 				}
 				form_section_div.append(field_div);
 			}
+			
 			$(hook).append(form_section_div);
 		},
 
@@ -66,8 +71,8 @@
 		getFormType : function(_fragment) {
 			var type;
 			
-			if (_fragment.type)
-				return _fragment.type;
+			if (_fragment.type || _fragment.enum)
+				return _fragment.type || "enum";
 
 			if (_fragment.items) {
 				type = jRender.ARRAY;
@@ -89,7 +94,8 @@
 		_createButtonToHandleRef : function(root, _fragment, type){
 			var button_for_render = new Button(_fragment.title || root);
 			var me = this;
-			var _buttonClickHandler = function(){
+			var _buttonClickHandler = function(e){
+				e.preventDefault();
 				me.form_sections[root] = new FormSection(root);
 				me.form_sections[root].fields.push(me.parse(root, _fragment));
 				me.draw(root, this.parentNode);
@@ -150,12 +156,20 @@
 					_in_process[root] = false;
 					return this.form_sections[root];
 				} else {
-
 					return this._createButtonToHandleRef(root, _fragment, type);
 				}
 				
 			} else {
-				return new Field(root, _fragment.type);
+				var render_options = this.render_options["render-types"];
+				var render_type = (render_options && render_options[type]) || null;
+				var options;
+				if (_fragment.enum){
+					options = _fragment.enum;
+				}
+				else if (_fragment.type == "boolean"){
+					options = (_fragment.format && _fragment.format.split("/")) || ["True", "False"];
+				}
+				return new Field(root, render_type || type , options);
 			}
 		}
 	};
@@ -213,12 +227,54 @@
 	Field.prototype = new DOMElement;
 	
 	Field.prototype.setHTML = function(){
-		var html = jQuery("<input>").attr("placeholder", this.name);
+		var html;
+		if (this.type == "select") {
+			var header = jQuery("<h4>").html(this.name);
+			html = jQuery("<select>");
+			var o = new Option("Please Choose", "");
+			$(o).html("Please Choose");
+			html.append(o);
+			for (var i=0; i<this.options.length; i++){
+				o = new Option(this.options[i], this.options[i]);
+				$(o).html(this.options[i]);
+				html.append(o);
+			}
+			html = jQuery("<div>").append(html);
+			html.prepend(header);
+			this.html = html;
+		} else if (this.type=="radio" || this.type=="checkbox"){
+			var header = jQuery("<h4>").html(this.name);
+			html = jQuery("<div>");
+			html.append(header);
+			var o;
+			for (var i=0; i<this.options.length; i++){
+				o = "<input type='"+this.type+"' name='"+this.name+"' value='"+ this.options[i]+"'>"+this.options[i] + "<br>";
+				html.append(o);
+			}
+			this.html = html;
+		} 
+		else {
+			html = jQuery("<input>").attr("placeholder", this.name);
+			this.html = html;
+		}
+	}
+	
+	var Form = function(name, method, action) {
+		this.name = name;
+		this.method = method;
+		this.action = action;
+		this.setHTML();
+	}
+	
+	Form.prototype = new DOMElement;
+	
+	Form.prototype.setHTML = function(){
+		var html = jQuery("<form>").attr("method", this.method).attr("action", this.action).attr("name", this.name);
 		this.html = html;
 	}
 
 	jRender.UTILS = {
-		"Form" : FormSection,
+		"FormSection" : FormSection,
 		"Button" : Button,
 		"Field" : Field
 	};
