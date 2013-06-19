@@ -12,8 +12,8 @@ To include jRender in your project, first clone the repository with:
 
 And then add the following lines to your code : 
 
-<pre><code><script src="lib/jquery.js" type="text/javascript"></script>
-<script src="jRender.js" type="text/javascript"></script>
+<pre><code>&ltscript src="lib/jquery.js" type="text/javascript"&gt&lt/script&gt
+&ltscript src="jRender.js" type="text/javascript"&gt&lt/script&gt
 </code></pre> 
 
 ###Examples ######
